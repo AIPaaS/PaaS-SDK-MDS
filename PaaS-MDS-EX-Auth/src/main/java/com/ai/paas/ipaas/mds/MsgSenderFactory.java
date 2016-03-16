@@ -23,8 +23,7 @@ public class MsgSenderFactory {
     private static Map<String, IMessageSender> _senders = new ConcurrentHashMap<String, IMessageSender>();
 
 
-    public static IMessageSender getClient(Properties kafaProps, String userId,
-                                           String topic) {
+    public static IMessageSender getClient(Properties kafaProps, String topic) {
         IMessageSender sender = null;
         Assert.notNull(kafaProps,
                 ResourceUtil.getMessage("com.ai.paas.ipaas.msg.cfg_null"));
