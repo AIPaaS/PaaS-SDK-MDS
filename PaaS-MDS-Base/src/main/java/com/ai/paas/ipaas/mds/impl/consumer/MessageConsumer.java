@@ -114,8 +114,8 @@ public class MessageConsumer implements IMessageConsumer {
 //                + PaaSConstant.UNIX_SEPERATOR
 //                + kafkaConfig._stateConf.get(Config.KAFKA_TOPIC)
 //                + "/consumer/partitions/";
-        runningLockPath = (kafkaConfig._stateConf.get(Config.MDS_PARTITION_RUNNING_LOCK_PATH) + "running/");
-        pauseLockPath = (kafkaConfig._stateConf.get(Config.MDS_PARTITION_PAUSE_LOCK_PATH) + "pause/");
+        runningLockPath = (kafkaConfig._stateConf.get(Config.MDS_PARTITION_RUNNING_LOCK_PATH) + "/running/");
+        pauseLockPath = (kafkaConfig._stateConf.get(Config.MDS_PARTITION_PAUSE_LOCK_PATH) + "/pause/");
         for (int i = 0; i < _partitionCount; i++) {
             // 这里需要初始化锁
             paritions.add(i);

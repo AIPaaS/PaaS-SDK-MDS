@@ -434,8 +434,14 @@ public class PartitionManager implements Serializable {
             }
             try {
                 // 记录offset
+                //采用新的ZKClient，需要注意以前的逻辑，以前会判断节点是否存在，如果存在，则修改
+//                _zkClient.createNode(getCommittedPath(), new Gson().toJson(data));
+                if (_zkClient.exists(getCommittedPath())){
+                    _zkClient.setNodeData(getCommittedPath(), new Gson().toJson(data));
+                }else{
+                    _zkClient.createNode(getCommittedPath(), new Gson().toJson(data));
+                }
 
-                _zkClient.createNode(getCommittedPath(), new Gson().toJson(data));
                 logger.debug("Wrote committed offset to ZK: "
                         + _emittedToOffset);
                 _waitingToEmit.clear();

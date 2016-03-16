@@ -52,10 +52,27 @@ public class KafkaConfig implements Serializable {
         String decoderClass = props.getProperty("target.indexer.class");
         String mdsSrvId = props.getProperty(Config.MDS_USER_SRV_ID);
 
+        // need to check the configuration values
         String partitionRunningLockPath = props.getProperty(Config.MDS_PARTITION_RUNNING_LOCK_PATH);
+        if (partitionRunningLockPath == null || partitionRunningLockPath.length() == 0){
+            throw new IllegalArgumentException("Failed to find the configuration [" +
+                    Config.MDS_PARTITION_RUNNING_LOCK_PATH + "]");
+        }
         String partitionPauseLockPath = props.getProperty(Config.MDS_PARTITION_PAUSE_LOCK_PATH);
+        if (partitionPauseLockPath == null || partitionPauseLockPath.length() == 0){
+            throw new IllegalArgumentException("Failed to find the configuration [" +
+                    Config.MDS_PARTITION_PAUSE_LOCK_PATH + "]");
+        }
         String offsetBasePath = props.getProperty(Config.MDS_PARTITION_OFFSET_BASE_PATH);
+        if (offsetBasePath == null || offsetBasePath.length() == 0){
+            throw new IllegalArgumentException("Failed to find the configuration [" +
+                    Config.MDS_PARTITION_OFFSET_BASE_PATH + "]");
+        }
         String consumerBasePath = props.getProperty(Config.MDS_CONSUMER_BASE_PATH);
+        if (consumerBasePath == null || consumerBasePath.length() == 0){
+            throw new IllegalArgumentException("Failed to find the configuration [" +
+                    Config.MDS_CONSUMER_BASE_PATH + "]");
+        }
 
         _stateConf = new HashMap();
         _stateConf.put(Config.KAFKA_ZOOKEEPER_HOSTS, zkHost);
