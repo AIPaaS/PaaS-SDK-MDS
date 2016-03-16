@@ -39,7 +39,7 @@ public class Config extends HashMap<String, Object> implements Serializable {
      */
     public static final String MDS_PARTITION_RUNNING_LOCK_PATH = "mds.partition.runninglock.path";
     public static final String MDS_PARTITION_PAUSE_LOCK_PATH = "mds.partition.pauselock.path";
-    public static final String MDS_PARTITION_OFFSET_BASE_PATH = "mds.partition.adjustedoffset.basepath";
+    public static final String MDS_PARTITION_OFFSET_BASE_PATH = "mds.partition.offset.basepath";
     public static final String MDS_CONSUMER_BASE_PATH = "mds.consumer.base.path";
 
 
