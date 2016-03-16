@@ -24,7 +24,6 @@ public class MsgConsumerFactory {
     private static Map<String, IMessageConsumer> _consumers = new ConcurrentHashMap<String, IMessageConsumer>();
 
     /**
-     *
      * @param props
      * @param topic
      * @param msgProcessorHandler
@@ -47,9 +46,27 @@ public class MsgConsumerFactory {
         if (zkAddress == null || zkAddress.length() == 0) {
             throw new IllegalArgumentException("Can not found zookeeper hosts. [mds.zookeeper.hosts] is null ");
         }
+        
+        int timeout = Integer.parseInt(props.getProperty("mds.zookeeper.timout", "10000"));
+
+        String[] authInfoArray = null;
+        String authInfo = null;
+        try {
+            authInfo = props.getProperty("mds.zookeeper.authInfo");
+
+            if (authInfo != null && authInfo.length() > 0) {
+                String[] authInfoTmp = authInfo.split(":");
+                if (authInfoTmp != null && authInfoTmp.length == 2) {
+                    authInfoArray = authInfoTmp;
+                }
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Failed to convert [mds.zookeeper.authInfo]:" + authInfo);
+        }
+
         ZKClient zkClient = null;
         try {
-            zkClient = ZKPoolFactory.getZKPool(zkAddress, 1000, null).getZkClient(zkAddress);
+            zkClient = ZKPoolFactory.getZKPool(zkAddress, timeout, authInfoArray).getZkClient(zkAddress);
         } catch (Exception e) {
             throw new RuntimeException("Failed to create zkClient during initial message consumer", e);
         }
