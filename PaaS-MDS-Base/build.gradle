@@ -1,0 +1,42 @@
+dependencies {
+    compile 'com.ai:ipaas-common:0.1-SNAPSHOT'
+    compile 'com.ai:ipaas-zookeeper-utility:0.2.2-SNAPSHOT'
+    compile ('org.apache.kafka:kafka_2.10:0.8.2.1'){
+        exclude group: 'org.slf4j', module: 'slf4j-api'
+        exclude group: 'com.101tec', module: 'zkclient'
+    }
+    compile 'org.apache.commons:commons-pool2:2.3'
+    notInclude  'org.apache.logging.log4j:log4j-1.2-api:2.2'
+    testCompile 'junit:junit:4.12'
+    testCompile	 ('org.apache.jmeter:ApacheJMeter_junit:2.13'){
+        exclude group: 'commons-math3', module: 'commons-math3'
+        exclude group: 'commons-pool2', module: 'commons-pool2'
+    }
+}
+
+publishing {
+    publications {
+        publishing.publications.create("${moduleName}", MavenPublication) {
+            groupId group
+            artifactId moduleName
+            version moduleVersion
+            artifact  jar
+            pom.withXml {
+                asNode().children().last() + {
+                    delegate.dependencies {
+
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            url  publishURL
+            credentials {
+                username = publishUserName
+                password = publishUserPassword
+            }
+        }
+    }
+}
