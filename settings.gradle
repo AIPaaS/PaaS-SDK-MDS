@@ -1,1 +1,1 @@
-include "PaaS-MDS-Base","PaaS-MDS-EX-Auth"
+include "PaaS-MDS-Base","PaaS-MDS-EX-Auth","PaaS-MDS-IC-Auth"

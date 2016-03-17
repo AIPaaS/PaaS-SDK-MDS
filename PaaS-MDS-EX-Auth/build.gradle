@@ -1,0 +1,34 @@
+dependencies {
+    compile project(":PaaS-MDS-Base")
+}
+
+publishing {
+    publications {
+        publishing.publications.create("${moduleName}", MavenPublication) {
+            groupId group
+            artifactId moduleName
+            version moduleVersion
+            artifact  jar
+            pom.withXml {
+                asNode().children().last() + {
+                    delegate.dependencies {
+                        delegate.dependency {
+                            delegate.groupId("com.ai")
+                            delegate.artifactId("paas-mds-base")
+                            delegate.version("1.2.2-SNAPSHOT")
+                        }
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            url  publishURL
+            credentials {
+                username = publishUserName
+                password = publishUserPassword
+            }
+        }
+    }
+}
