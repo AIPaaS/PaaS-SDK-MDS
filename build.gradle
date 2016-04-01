@@ -35,10 +35,10 @@ subprojects{
 
     dependencies{
         //compile 'com.ai:ipaas-common:0.1-SNAPSHOT'
-//        testCompile(
-//                "org.springframework:spring-test:4.1.5.RELEASE",
-//                "junit:junit:4.11"
-//        )
+        testCompile(
+                "org.springframework:spring-test:4.1.5.RELEASE",
+                "junit:junit:4.11"
+        )
 //
 //        testCompile  ('org.apache.jmeter:ApacheJMeter_junit:2.13'){
 //            exclude group: 'commons-math3', module: 'commons-math3'
