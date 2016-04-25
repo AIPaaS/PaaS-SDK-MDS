@@ -1,10 +1,10 @@
 .idea/
 build/
 target/
-/bin/
-.gradle/
-/.project
-/.classpath
+bin/
+.project
+.classpath
 .settings/
+.gradle/
 .settings
-.gradle
+/.gradle
