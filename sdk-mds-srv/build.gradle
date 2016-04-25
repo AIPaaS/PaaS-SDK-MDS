@@ -1,5 +1,5 @@
 dependencies {
-    compile project(":PaaS-MDS-Base")
+    compile project(":sdk-mds-base")
 }
 
 publishing {
