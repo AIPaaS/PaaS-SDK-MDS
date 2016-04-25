@@ -1,7 +1,7 @@
 dependencies {
     compile project(":PaaS-MDS-Base")
-    compile 'com.ai:ipaas-uac:0.2'
-    compile 'com.ai:ipaas-ccs-inner:1.2.1'
+    compile 'com.ai:ipaas-uac:0.3'
+    compile 'com.ai:ipaas-ccs-inner:0.3'
 }
 
 publishing {
@@ -17,17 +17,17 @@ publishing {
                         delegate.dependency {
                             delegate.groupId("com.ai")
                             delegate.artifactId("paas-mds-base")
-                            delegate.version("1.2.2-SNAPSHOT")
+                            delegate.version("0.3")
                         }
                         delegate.dependency {
                             delegate.groupId("com.ai")
                             delegate.artifactId("ipaas-uac")
-                            delegate.version("0.2")
+                            delegate.version("0.3")
                         }
                         delegate.dependency {
                             delegate.groupId("com.ai")
                             delegate.artifactId("ipaas-ccs-inner")
-                            delegate.version("1.2.1")
+                            delegate.version("0.3")
                         }
                     }
                 }
@@ -36,7 +36,11 @@ publishing {
     }
     repositories {
         maven {
-            url  publishURL
+            if(moduleVersion.endsWith('-SNAPSHOT')) {
+                url publishSnapShotsURL
+            } else {
+                url publishReleaseURL
+            }
             credentials {
                 username = publishUserName
                 password = publishUserPassword

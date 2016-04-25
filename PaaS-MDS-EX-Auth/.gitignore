@@ -2,3 +2,4 @@
 PaaS-MDS-EX-Auth.iml
 build/
 target/
+/bin/

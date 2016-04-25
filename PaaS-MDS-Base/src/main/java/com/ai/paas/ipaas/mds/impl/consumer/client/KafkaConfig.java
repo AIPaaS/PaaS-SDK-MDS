@@ -1,7 +1,3 @@
-/*
- *   This file is based on the source code of the Kafka spout of the Apache Storm project.
- *   (https://github.com/apache/storm/tree/master/external/storm-kafka)
- */
 
 package com.ai.paas.ipaas.mds.impl.consumer.client;
 
@@ -22,7 +18,7 @@ public class KafkaConfig implements Serializable {
     public int _bufferSizeBytes = _fetchSizeBytes;
 
     public int _refreshFreqSecs = 100;
-    public int _socketTimeoutMs = 20000;
+    public int _socketTimeoutMs = 60000;
 
     public boolean _forceFromStart = false;
     public long _startOffsetTime = kafka.api.OffsetRequest.EarliestTime();

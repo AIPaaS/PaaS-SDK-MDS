@@ -4,12 +4,12 @@ allprojects{
     apply plugin: 'maven-publish'
 
     ext {
-        //moduleName="ipaas-config-sdk";
-        moduleVersion="1.2.2-SNAPSHOT"
+        moduleVersion="0.3"
+        //moduleVersion="0.3-SNAPSHOT"
         publishUserName = "devadm"
         publishUserPassword = "Devadm@1212"
-        //publishURL="http://10.1.228.199:18081/nexus/content/repositories/releases/"
-        publishURL="http://10.1.228.199:18081/nexus/content/repositories/snapshots/"
+        publishSnapShotsURL="http://10.1.228.199:18081/nexus/content/repositories/snapshots/"
+		publishReleaseURL="http://10.1.228.199:18081/nexus/content/repositories/releases/"
         builtBy="gradle 2.1"
     }
 
@@ -34,16 +34,10 @@ subprojects{
     }
 
     dependencies{
-        //compile 'com.ai:ipaas-common:0.1-SNAPSHOT'
         testCompile(
                 "org.springframework:spring-test:4.1.5.RELEASE",
                 "junit:junit:4.11"
         )
-//
-//        testCompile  ('org.apache.jmeter:ApacheJMeter_junit:2.13'){
-//            exclude group: 'commons-math3', module: 'commons-math3'
-//            exclude group: 'commons-pool2', module: 'commons-pool2'
-//        }
 
     }
 
@@ -86,7 +80,7 @@ project("PaaS-MDS-EX-Auth"){
 
 project("PaaS-MDS-IC-Auth"){
     project.ext {
-        moduleName = "paas-mds-ic-auth"
+        moduleName = "paas-mds"
     }
 
     jar {

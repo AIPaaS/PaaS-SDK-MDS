@@ -2,3 +2,4 @@
 PaaS-MDS-Base.iml
 build/
 target/
+/bin/

@@ -2,7 +2,6 @@ package test.com.ai.paas.ipaas.mds;
 
 import com.ai.paas.ipaas.mds.IMessageProcessor;
 import com.ai.paas.ipaas.mds.IMsgProcessorHandler;
-import com.ai.paas.ipaas.mds.vo.MessageAndMetadata;
 
 import java.util.ArrayList;
 import java.util.List;

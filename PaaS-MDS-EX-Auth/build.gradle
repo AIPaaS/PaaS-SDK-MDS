@@ -15,7 +15,7 @@ publishing {
                         delegate.dependency {
                             delegate.groupId("com.ai")
                             delegate.artifactId("paas-mds-base")
-                            delegate.version("1.2.2-SNAPSHOT")
+                            delegate.version("0.3")
                         }
                     }
                 }
@@ -24,7 +24,11 @@ publishing {
     }
     repositories {
         maven {
-            url  publishURL
+            if(moduleVersion.endsWith('-SNAPSHOT')) {
+                url publishSnapShotsURL
+            } else {
+                url publishReleaseURL
+            }
             credentials {
                 username = publishUserName
                 password = publishUserPassword

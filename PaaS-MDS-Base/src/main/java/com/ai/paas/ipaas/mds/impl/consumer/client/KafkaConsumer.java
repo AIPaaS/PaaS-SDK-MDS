@@ -1,7 +1,3 @@
-/*
- *   This file is based on the source code of the Kafka spout of the Apache Storm project.
- *   (https://github.com/apache/storm/tree/master/external/storm-kafka)
- */
 
 package com.ai.paas.ipaas.mds.impl.consumer.client;
 
@@ -51,7 +47,7 @@ public class KafkaConsumer implements Runnable, Serializable {
                          String pauseLockPath, IMessageProcessor processor) {
         _kafkaConfig = kafkaConfig;
         _partitionId = partitionId;
-        // 此处不应所有线程共用一个连接，这样的话某个线程退出了，则ZK并没有退出
+        // 此处不应所有线程共用一个连接，这样的话某个线程退出了，则ZK并没有退出，导致节点变化并没有监控到
         // 由于CCS性质，好像没办法
         _zkClient = zkClient;
         _consumer = consumer;
@@ -79,13 +75,14 @@ public class KafkaConsumer implements Runnable, Serializable {
         }
 
         try {
-            // 阻塞模式
+            // 非阻塞模式
             logger.info("Parition id:" + _partitionId
                     + ",Starting to acquire lock....." + _runningLockPath);
-            // 这里需要多尝试几次，默认10次吧，每次休眠60秒
+            // 这里需要多尝试几次，默认5次吧，每次休眠60秒
             boolean gotLock = false;
             int loop = 0;
             while (!gotLock && loop < 5) {
+            	//尝试20秒内获取锁
                 if (runningLock.acquire(20, TimeUnit.SECONDS)) {
                     logger.info("Parition id:" + _partitionId
                             + ",Got running lock....." + _runningLockPath);
@@ -184,6 +181,7 @@ public class KafkaConsumer implements Runnable, Serializable {
             // 这里可能存在kafka问题，也可能是自身的问题
             logger.warn("Fetch failed. Refresing Coordinator..", fe);
             try {
+            	//再尝试取消息
                 _coordinator.refresh();
                 _partitionManager = _coordinator.getMyManagedPartitions()
                         .get(0);
