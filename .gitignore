@@ -6,3 +6,5 @@ target/
 /.project
 /.classpath
 .settings/
+.settings
+.gradle
