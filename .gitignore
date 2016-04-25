@@ -8,3 +8,8 @@ bin/
 .gradle/
 .settings
 /.gradle
+/PaaS-MDS-Base/.classpath
+/PaaS-MDS-Base/.project
+/PaaS-MDS-EX-Auth/.project
+/PaaS-MDS-EX-Auth/.classpath
+/PaaS-MDS-EX-Auth/.settings
