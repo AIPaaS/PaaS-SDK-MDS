@@ -1,5 +1,8 @@
 .idea/
-PaaS-MDS-Base.iml
 build/
 target/
 /bin/
+.gradle/
+/.project
+/.classpath
+.settings/
