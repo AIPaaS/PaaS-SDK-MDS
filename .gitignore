@@ -2,3 +2,5 @@
 PaaS-SDK-MDS.iml
 build/
 target/
+/PaaS-MDS-IC-Auth/.project
+/PaaS-MDS-IC-Auth/.classpath
