@@ -5,7 +5,6 @@ dependencies {
         exclude group: 'org.slf4j', module: 'slf4j-api'
         exclude group: 'com.101tec', module: 'zkclient'
     }
-    compile 'org.apache.commons:commons-pool2:2.3'
     compile 'org.slf4j:slf4j-api:1.7.19'
     testCompile 'junit:junit:4.12'
     testCompile	 ('org.apache.jmeter:ApacheJMeter_junit:2.13'){
@@ -38,11 +37,6 @@ publishing {
                             delegate.groupId("org.apache.kafka")
                             delegate.artifactId("kafka_2.10")
                             delegate.version("0.9.0.1")
-                        }
-                        delegate.dependency {
-                            delegate.groupId("org.apache.commons")
-                            delegate.artifactId("commons-pool2")
-                            delegate.version("2.3")
                         }
                     }
                 }

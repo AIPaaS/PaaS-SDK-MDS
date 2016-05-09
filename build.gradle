@@ -17,7 +17,10 @@ allprojects{
     sourceCompatibility = 1.7
 
     configurations.all {
-        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+	    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+	    resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
+	    exclude group: 'log4j', module: 'log4j'
+	    exclude group: "org.slf4j", module: "slf4j-log4j12"
     }
 
     configurations {
@@ -63,7 +66,7 @@ project("sdk-mds-base"){
 
 project("sdk-mds-comp"){
     project.ext {
-        moduleName = "paas-mds-ex-auth"
+        moduleName = "paas-mds-comp"
     }
 
     jar {
