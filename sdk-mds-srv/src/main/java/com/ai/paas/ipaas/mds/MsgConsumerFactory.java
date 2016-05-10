@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.ai.paas.ipaas.PaasRuntimeException;
 import com.ai.paas.ipaas.ccs.constants.ConfigException;
 import com.ai.paas.ipaas.ccs.inner.CCSComponentFactory;
 import com.ai.paas.ipaas.ccs.zookeeper.ZKClient;
@@ -29,6 +30,59 @@ public class MsgConsumerFactory {
 	private static Map<String, IMessageConsumer> consumers = new ConcurrentHashMap<String, IMessageConsumer>();
 	private static Map<String, IMessageConsumer> _consumers = new ConcurrentHashMap<String, IMessageConsumer>();
 
+	/**
+	 * 支持多消费端，获取消息队列消费端
+	 * 
+	 * @param ad
+	 *            带服务标识身份认证信息
+	 * @param msgProcessorHandler
+	 *            消息处理器
+	 * @param consumerId
+	 *            消费者标识，默认为consumer，尽量不要使用consumer
+	 * @return
+	 */
+	public static IMessageConsumer getClient(AuthDescriptor ad,
+			IMsgProcessorHandler msgProcessorHandler, String consumerId) {
+		IMessageConsumer consumer = null;
+		Assert.notNull(consumerId, "consumer id is null!");
+		if ("consumer".equalsIgnoreCase(consumerId)) {
+			throw new PaasRuntimeException("consumer id ");
+		}
+		MsgUtil.validate(ad);
+		AuthResult authResult = UserClientFactory.getUserClient().auth(ad);
+		MsgUtil.validateAuthResult(authResult);
+		List<String> children = null;
+		try {
+			children = CCSComponentFactory.getConfigClient(
+					authResult.getConfigAddr(), authResult.getConfigUser(),
+					authResult.getConfigPasswd()).listSubPath(
+					MsgConstant.MSG_CONFIG_ROOT + ad.getServiceId());
+		} catch (ConfigException e) {
+			throw new MessageClientException(
+					"MsgSenderFactory getClient error!", e);
+		}
+		if (null == children || children.size() <= 0) {
+			throw new MessageClientException(
+					"MsgSenderFactory can not get config info for:"
+							+ ad.getServiceId());
+		}
+		String topic = children.get(0);
+		MsgUtil.validateTopic(topic);
+		// 获取该用户申请的kafka服务配置信息
+		consumer = MsgUtil.instanceConsumer(ad.getServiceId(), consumerId,
+				authResult, topic, msgProcessorHandler);
+		return consumer;
+	}
+
+	/**
+	 * 获取消息队列消费端
+	 * 
+	 * @param ad
+	 *            含服务标识等信息的身份验证对象
+	 * @param msgProcessorHandler
+	 *            如何处理消息的对象，里面的消息处理器和分区数对应
+	 * @return
+	 */
 	public static IMessageConsumer getClient(AuthDescriptor ad,
 			IMsgProcessorHandler msgProcessorHandler) {
 		IMessageConsumer consumer = null;
@@ -66,6 +120,17 @@ public class MsgConsumerFactory {
 		return consumer;
 	}
 
+	/**
+	 * 获取消息队列消费端
+	 * 
+	 * @param ad
+	 *            含服务标识等信息的身份验证对象
+	 * @param topic
+	 *            消息队列名称
+	 * @param msgProcessorHandler
+	 *            如何处理消息的对象，里面的消息处理器和分区数对应
+	 * @return
+	 */
 	public static IMessageConsumer getClient(AuthDescriptor ad, String topic,
 			IMsgProcessorHandler msgProcessorHandler) {
 		IMessageConsumer consumer = null;
@@ -90,6 +155,19 @@ public class MsgConsumerFactory {
 		return consumer;
 	}
 
+	/**
+	 * 获取消息队列消费端
+	 * 
+	 * @param authResult
+	 *            身份验证结果，主要为了获取消息队列信息
+	 * @param props
+	 *            队列信息 ，属性定义
+	 * @param topic
+	 *            消息队列名称
+	 * @param msgProcessorHandler
+	 *            如何处理消息的对象，里面的消息处理器和分区数对应
+	 * @return
+	 */
 	public static IMessageConsumer getClient(AuthResult authResult,
 			Properties props, String topic,
 			IMsgProcessorHandler msgProcessorHandler) {

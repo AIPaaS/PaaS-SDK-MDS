@@ -87,7 +87,7 @@ public class MsgUtil {
 	}
 
 	public static IMessageConsumer instanceConsumer(String serviceId,
-			AuthResult authResult, String topic,
+			String consumerId, AuthResult authResult, String topic,
 			IMsgProcessorHandler msgProcessorHandler) {
 		IMessageConsumer consumer = null;
 		String msgConf;
@@ -109,50 +109,35 @@ public class MsgUtil {
 		// 这里需要将topic加上
 		props.put("kafka.topic", topic);
 		props.put(Config.MDS_USER_SRV_ID, serviceId);
+		String basePath = MsgConstant.MSG_CONFIG_ROOT
+				+ props.getProperty(Config.MDS_USER_SRV_ID)
+				+ PaaSConstant.UNIX_SEPERATOR
+				+ props.getProperty("kafka.topic")
+				+ PaaSConstant.UNIX_SEPERATOR + consumerId
+				+ PaaSConstant.UNIX_SEPERATOR;
 		try {
 			// mds.partition.runninglock.path
 			props.put(Config.MDS_PARTITION_RUNNING_LOCK_PATH, ConfigPathMode
-					.appendPath(
-							authResult.getConfigUser(),
-							ConfigPathMode.WRITABLE.getFlag(),
-							MsgConstant.MSG_CONFIG_ROOT
-									+ props.getProperty(Config.MDS_USER_SRV_ID)
-									+ PaaSConstant.UNIX_SEPERATOR
-									+ props.getProperty("kafka.topic")
-									+ "/consumer/partitions/running"));
+					.appendPath(authResult.getConfigUser(),
+							ConfigPathMode.WRITABLE.getFlag(), basePath
+									+ "partitions/running"));
 
 			// mds.partition.pauselock.path
 			props.put(Config.MDS_PARTITION_PAUSE_LOCK_PATH, ConfigPathMode
-					.appendPath(
-							authResult.getConfigUser(),
-							ConfigPathMode.WRITABLE.getFlag(),
-							MsgConstant.MSG_CONFIG_ROOT
-									+ props.getProperty(Config.MDS_USER_SRV_ID)
-									+ PaaSConstant.UNIX_SEPERATOR
-									+ props.getProperty("kafka.topic")
-									+ "/consumer/partitions/pause"));
+					.appendPath(authResult.getConfigUser(),
+							ConfigPathMode.WRITABLE.getFlag(), basePath
+									+ "partitions/pause"));
 
 			// mds.partition.offset.basepath
 			props.put(Config.MDS_PARTITION_OFFSET_BASE_PATH, ConfigPathMode
-					.appendPath(
-							authResult.getConfigUser(),
-							ConfigPathMode.WRITABLE.getFlag(),
-							MsgConstant.MSG_CONFIG_ROOT
-									+ props.getProperty(Config.MDS_USER_SRV_ID)
-									+ PaaSConstant.UNIX_SEPERATOR
-									+ props.getProperty("kafka.topic")
-									+ PaaSConstant.UNIX_SEPERATOR + "consumer"
-									+ PaaSConstant.UNIX_SEPERATOR + "offsets"));
+					.appendPath(authResult.getConfigUser(),
+							ConfigPathMode.WRITABLE.getFlag(), basePath
+									+ "offsets"));
 
 			// mds.consumer.base.path
 			props.put(Config.MDS_CONSUMER_BASE_PATH, ConfigPathMode.appendPath(
 					authResult.getConfigUser(),
-					ConfigPathMode.WRITABLE.getFlag(),
-					MsgConstant.MSG_CONFIG_ROOT
-							+ props.getProperty(Config.MDS_USER_SRV_ID)
-							+ PaaSConstant.UNIX_SEPERATOR
-							+ props.getProperty("kafka.topic")
-							+ "/consumer/consumers"));
+					ConfigPathMode.WRITABLE.getFlag(), basePath + "consumers"));
 		} catch (Exception e) {
 			throw new MessageClientException("MessageConsumer init error!", e);
 		}
@@ -172,5 +157,12 @@ public class MsgUtil {
 				msgProcessorHandler);
 
 		return consumer;
+	}
+
+	public static IMessageConsumer instanceConsumer(String serviceId,
+			AuthResult authResult, String topic,
+			IMsgProcessorHandler msgProcessorHandler) {
+		return instanceConsumer(serviceId, "consumer", authResult, topic,
+				msgProcessorHandler);
 	}
 }
