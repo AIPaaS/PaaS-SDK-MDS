@@ -12,7 +12,9 @@ import com.ai.paas.ipaas.ccs.zookeeper.ZKClient;
 import com.ai.paas.ipaas.ccs.zookeeper.impl.ZKPoolFactory;
 import com.ai.paas.ipaas.mds.impl.consumer.MessageConsumer;
 import com.ai.paas.ipaas.mds.impl.consumer.client.Config;
+import com.ai.paas.ipaas.mds.impl.consumer.client.DynamicBrokersReader;
 import com.ai.paas.ipaas.mds.impl.consumer.client.KafkaConfig;
+import com.ai.paas.ipaas.mds.impl.consumer.client.ZkState;
 import com.ai.paas.ipaas.mds.impl.sender.MessageSender;
 import com.ai.paas.ipaas.uac.vo.AuthDescriptor;
 import com.ai.paas.ipaas.uac.vo.AuthResult;
@@ -81,8 +83,18 @@ public class MsgUtil {
 			maxProducer = Integer.parseInt((String) props
 					.get(MsgConstant.PROP_MAX_PRODUCER));
 		}
+		// 这里还需要取一下分区数,由于没有记录下来，直接去取
+		// 获取所有分区数，还得初始化
+		KafkaConfig kafkaConfig = buildConfig(authResult, topic, serviceId,
+				null);
+		ZkState zkState = new ZkState(kafkaConfig);
+		DynamicBrokersReader reader = new DynamicBrokersReader(kafkaConfig,
+				zkState);
+		int partitionCount = reader.getNumPartitions();
+		zkState.close();
+		reader.close();
 		// 开始构建实例
-		sender = new MessageSender(cfg, maxProducer, topic);
+		sender = new MessageSender(cfg, maxProducer, topic, partitionCount);
 		return sender;
 	}
 
@@ -90,6 +102,26 @@ public class MsgUtil {
 			String consumerId, AuthResult authResult, String topic,
 			IMsgProcessorHandler msgProcessorHandler) {
 		IMessageConsumer consumer = null;
+		KafkaConfig kafkaConfig = buildConfig(authResult, topic, serviceId,
+				consumerId);
+		// 开始构建实例
+		ZKClient zkClient = null;
+		try {
+			zkClient = ZKPoolFactory.getZKPool(authResult.getConfigAddr(),
+					authResult.getConfigUser(), authResult.getConfigPasswd(),
+					60000).getZkClient(authResult.getConfigAddr(),
+					authResult.getConfigUser());
+		} catch (Exception e) {
+			throw new MessageClientException("MessageConsumer init error!", e);
+		}
+		consumer = new MessageConsumer(zkClient, kafkaConfig,
+				msgProcessorHandler);
+
+		return consumer;
+	}
+
+	private static KafkaConfig buildConfig(AuthResult authResult, String topic,
+			String serviceId, String consumerId) {
 		String msgConf;
 		try {
 			msgConf = CCSComponentFactory
@@ -143,20 +175,7 @@ public class MsgUtil {
 		}
 		// 再次初始化
 		kafkaConfig = new KafkaConfig(props);
-		// 开始构建实例
-		ZKClient zkClient = null;
-		try {
-			zkClient = ZKPoolFactory.getZKPool(authResult.getConfigAddr(),
-					authResult.getConfigUser(), authResult.getConfigPasswd(),
-					60000).getZkClient(authResult.getConfigAddr(),
-					authResult.getConfigUser());
-		} catch (Exception e) {
-			throw new MessageClientException("MessageConsumer init error!", e);
-		}
-		consumer = new MessageConsumer(zkClient, kafkaConfig,
-				msgProcessorHandler);
-
-		return consumer;
+		return kafkaConfig;
 	}
 
 	public static IMessageConsumer instanceConsumer(String serviceId,

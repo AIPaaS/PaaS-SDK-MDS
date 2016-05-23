@@ -45,4 +45,10 @@ public interface IMessageSender {
 	 *            消息的key
 	 */
 	public void send(byte[] msg, long partitionId, String key);
+	
+	/**
+	 * 获取分区数量
+	 * @return
+	 */
+	public int getParititions();
 }
