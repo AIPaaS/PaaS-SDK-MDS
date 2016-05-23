@@ -1,5 +1,12 @@
 package com.ai.paas.ipaas.mds;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+
+import kafka.producer.ProducerConfig;
+
 import com.ai.paas.ipaas.ccs.constants.ConfigException;
 import com.ai.paas.ipaas.ccs.inner.CCSComponentFactory;
 import com.ai.paas.ipaas.mds.impl.sender.MessageSender;
@@ -8,13 +15,6 @@ import com.ai.paas.ipaas.uac.vo.AuthDescriptor;
 import com.ai.paas.ipaas.uac.vo.AuthResult;
 import com.ai.paas.ipaas.util.Assert;
 import com.ai.paas.ipaas.util.ResourceUtil;
-
-import kafka.producer.ProducerConfig;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class MsgSenderFactory {
 
@@ -58,7 +58,7 @@ public class MsgSenderFactory {
 			sender = senders.get(topic);
 			return sender;
 		}
-		//
+	
 		sender = MsgUtil.instanceSender(ad.getServiceId(), authResult, topic);
 		senders.put(topic, sender);
 		return sender;

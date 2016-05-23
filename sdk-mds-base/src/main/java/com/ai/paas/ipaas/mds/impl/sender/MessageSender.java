@@ -23,11 +23,22 @@ public class MessageSender implements IMessageSender {
 	private String topic = null;
 	private List<Producer<String, byte[]>> producerPool = new ArrayList<>();
 	private int maxProducer = 0;
+	private int paritions = 0;
 
 	public MessageSender(ProducerConfig cfg, int maxProducer, String topic) {
 		this.cfg = cfg;
 		this.topic = topic;
 		this.maxProducer = maxProducer;
+		// 初始化
+		initProducerPool();
+	}
+
+	public MessageSender(ProducerConfig cfg, int maxProducer, String topic,
+			int paritions) {
+		this.cfg = cfg;
+		this.topic = topic;
+		this.maxProducer = maxProducer;
+		this.paritions = paritions;
 		// 初始化
 		initProducerPool();
 	}
@@ -171,6 +182,11 @@ public class MessageSender implements IMessageSender {
 				}
 			}
 		}
+	}
+
+	@Override
+	public int getParititions() {
+		return paritions;
 	}
 
 }
