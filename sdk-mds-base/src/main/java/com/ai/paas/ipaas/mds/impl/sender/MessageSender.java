@@ -77,14 +77,14 @@ public class MessageSender implements IMessageSender {
 	}
 
 	@Override
-	public void send(String msg, long partitionId) {
+	public void send(String msg, long partitionKey) {
 		// 从连接池获取一个实例，进行发送
 		Assert.notNull(msg, "The message is null!");
 		Producer<String, byte[]> producer = null;
 		try {
 			producer = getProducer();
 			KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(
-					topic, String.valueOf(partitionId),
+					topic, String.valueOf(partitionKey),
 					msg.getBytes(PaaSConstant.CHARSET_UTF8));
 			producer.send(km);
 		} catch (Exception e) {
@@ -104,14 +104,14 @@ public class MessageSender implements IMessageSender {
 	}
 
 	@Override
-	public void send(byte[] msg, long partitionId) {
+	public void send(byte[] msg, long partitionKey) {
 		// 从连接池获取一个实例，进行发送
 		Assert.notNull(msg, "The message is null!");
 		Producer<String, byte[]> producer = null;
 		try {
 			producer = getProducer();
 			KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(
-					topic, String.valueOf(partitionId), msg);
+					topic, String.valueOf(partitionKey), msg);
 			producer.send(km);
 		} catch (Exception e) {
 			destoryProducer(producer);
@@ -130,7 +130,7 @@ public class MessageSender implements IMessageSender {
 	}
 
 	@Override
-	public void send(String msg, long partitionId, String key) {
+	public void send(String msg, long partitionKey, String key) {
 		// 从连接池获取一个实例，进行发送
 		Assert.notNull(msg, "The message is null!");
 		Assert.notNull(key, "The message key is null!");
@@ -138,7 +138,7 @@ public class MessageSender implements IMessageSender {
 		try {
 			producer = getProducer();
 			KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(
-					topic, key, String.valueOf(partitionId),
+					topic, key, String.valueOf(partitionKey),
 					msg.getBytes(PaaSConstant.CHARSET_UTF8));
 			producer.send(km);
 		} catch (Exception e) {
@@ -158,7 +158,7 @@ public class MessageSender implements IMessageSender {
 	}
 
 	@Override
-	public void send(byte[] msg, long partitionId, String key) {
+	public void send(byte[] msg, long partitionKey, String key) {
 		// 从连接池获取一个实例，进行发送
 		Assert.notNull(msg, "The message is null!");
 		Assert.notNull(key, "The message key is null!");
@@ -166,7 +166,7 @@ public class MessageSender implements IMessageSender {
 		try {
 			producer = getProducer();
 			KeyedMessage<String, byte[]> km = new KeyedMessage<String, byte[]>(
-					topic, key, String.valueOf(partitionId), msg);
+					topic, key, String.valueOf(partitionKey), msg);
 			producer.send(km);
 		} catch (Exception e) {
 			destoryProducer(producer);

@@ -17,4 +17,6 @@ public class MsgConstant extends PaaSConstant {
 	 * 调整后的消费位置
 	 */
 	public final static String CONSUMER_ADJUSTED_OFFSET = "adjusted_offset";
+
+	public final static String PARTITION_NUM = "partition.num";
 }

@@ -1,5 +1,6 @@
 package com.ai.paas.ipaas.mds;
 
+import com.ai.paas.ipaas.mds.impl.sender.MessageSender;
 import com.ai.paas.ipaas.util.Assert;
 import com.ai.paas.ipaas.util.ResourceUtil;
 
@@ -37,7 +38,11 @@ public class MsgSenderCmpFactory {
 			maxProducer = Integer.parseInt((String) kafaProps
 					.get(MsgConstant.PROP_MAX_PRODUCER));
 		}
-		sender = MsgCmpUtil.instanceSender(kafaProps, cfg, topic, maxProducer);
+		int pNum = 0;
+		if (null != kafaProps.getProperty(MsgConstant.PARTITION_NUM))
+			pNum = Integer.parseInt((String) kafaProps
+					.get(MsgConstant.PARTITION_NUM));
+		sender = new MessageSender(cfg, maxProducer, topic, pNum);
 		_senders.put(topic, sender);
 		return sender;
 	}
