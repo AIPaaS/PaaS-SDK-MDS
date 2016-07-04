@@ -1,8 +1,8 @@
 package com.ai.paas.ipaas.mds;
 
-import com.ai.paas.ipaas.mds.impl.sender.MessageSender;
 import com.ai.paas.ipaas.util.Assert;
 import com.ai.paas.ipaas.util.ResourceUtil;
+
 import kafka.producer.ProducerConfig;
 
 import java.util.Map;
@@ -37,7 +37,7 @@ public class MsgSenderCmpFactory {
 			maxProducer = Integer.parseInt((String) kafaProps
 					.get(MsgConstant.PROP_MAX_PRODUCER));
 		}
-		sender = new MessageSender(cfg, maxProducer, topic);
+		sender = MsgCmpUtil.instanceSender(kafaProps, cfg, topic, maxProducer);
 		_senders.put(topic, sender);
 		return sender;
 	}
