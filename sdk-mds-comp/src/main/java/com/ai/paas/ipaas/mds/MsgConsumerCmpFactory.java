@@ -11,12 +11,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class MsgConsumerFactory {
+public class MsgConsumerCmpFactory {
 	static {
 		ResourceUtil.addBundle("com.ai.paas.ipaas.mds.ipaas-message");
 	}
 
-	private MsgConsumerFactory() {
+	private MsgConsumerCmpFactory() {
 		// 禁止私有化
 	}
 

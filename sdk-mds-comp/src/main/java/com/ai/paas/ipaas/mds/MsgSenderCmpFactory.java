@@ -9,13 +9,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class MsgSenderFactory {
+public class MsgSenderCmpFactory {
 
 	static {
 		ResourceUtil.addBundle("com.ai.paas.ipaas.mds.ipaas-message");
 	}
 
-	private MsgSenderFactory() {
+	private MsgSenderCmpFactory() {
 		// 禁止私有化
 	}
 

@@ -1,7 +1,7 @@
 package test.com.ai.paas.ipaas.mds;
 
 import com.ai.paas.ipaas.mds.IMessageSender;
-import com.ai.paas.ipaas.mds.MsgSenderFactory;
+import com.ai.paas.ipaas.mds.MsgSenderCmpFactory;
 import org.junit.Test;
 
 import java.util.Properties;
@@ -26,7 +26,7 @@ public class MsgSenderTest {
         properties.setProperty("maxProducer","5");
 
         String topicId = "MDS-TEST";
-        IMessageSender sender = MsgSenderFactory.getClient(properties, topicId);
+        IMessageSender sender = MsgSenderCmpFactory.getClient(properties, topicId);
         sender.send("Hello World", 1);
     }
 }

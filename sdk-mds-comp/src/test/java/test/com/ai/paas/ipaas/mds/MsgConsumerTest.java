@@ -2,7 +2,7 @@ package test.com.ai.paas.ipaas.mds;
 
 import com.ai.paas.ipaas.mds.IMessageConsumer;
 import com.ai.paas.ipaas.mds.IMsgProcessorHandler;
-import com.ai.paas.ipaas.mds.MsgConsumerFactory;
+import com.ai.paas.ipaas.mds.MsgConsumerCmpFactory;
 
 import java.util.Properties;
 
@@ -24,7 +24,7 @@ public class MsgConsumerTest {
 
         String topicId = "MDS-TEST";
         IMsgProcessorHandler processorClass = new ProcessorClass();
-        IMessageConsumer sender = MsgConsumerFactory.getClient(properties, topicId, processorClass);
+        IMessageConsumer sender = MsgConsumerCmpFactory.getClient(properties, topicId, processorClass);
         sender.start();
         while (true) {
             Thread.sleep(1000L);
