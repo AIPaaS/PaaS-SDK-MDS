@@ -6,6 +6,35 @@ dependencies {
 
 publishing {
     publications {
+    	mavenJar(MavenPublication) {
+    		groupId group
+        	artifactId "${moduleName}"
+            artifact sourcesJar
+            version moduleVersion
+            pom.withXml {
+                asNode().children().last() + {
+                    delegate.dependencies {
+                        delegate.dependency {
+                            delegate.groupId("com.ai")
+                            delegate.artifactId("ipaas-mds-base")
+                            delegate.version("0.3")
+                        }
+                        delegate.dependency {
+                            delegate.groupId("com.ai")
+                            delegate.artifactId("ipaas-uac")
+                            delegate.version("0.3")
+                        }
+                        delegate.dependency {
+                            delegate.groupId("com.ai")
+                            delegate.artifactId("ipaas-ccs-inner")
+                            delegate.version("0.3")
+                        }
+                    }
+                }
+            }
+        }
+            
+            
         publishing.publications.create("${moduleName}", MavenPublication) {
             groupId group
             artifactId moduleName
