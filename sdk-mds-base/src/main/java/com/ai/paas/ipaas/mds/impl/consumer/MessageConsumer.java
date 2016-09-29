@@ -26,7 +26,7 @@ public class MessageConsumer implements IMessageConsumer {
 	/**
 	 * 消费线程列表/每个分区一个
 	 */
-	private List<KafkaConsumer> consumers = new ArrayList<>();
+	private List<KafkaConsumer> consumers = Collections.synchronizedList(new ArrayList<KafkaConsumer>());
 	/**
 	 * 分区数
 	 */
@@ -123,7 +123,7 @@ public class MessageConsumer implements IMessageConsumer {
 		return this;
 	}
 
-	public synchronized void addConumser(KafkaConsumer consumer) {
+	public void addConumser(KafkaConsumer consumer) {
 		consumers.add(consumer);
 	}
 
