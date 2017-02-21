@@ -11,7 +11,7 @@ public class MsgSenderTest {
     @Test
     public void testSenderMessage() {
         Properties properties = new Properties();
-        properties.setProperty("metadata.broker.list","127.0.0.1:9092");
+        properties.setProperty("metadata.broker.list","10.1.245.225:31092,10.1.245.8:31093,10.1.245.9:31094");
         properties.setProperty("serializer.class","kafka.serializer.DefaultEncoder");
         properties.setProperty("key.serializer.class","kafka.serializer.StringEncoder");
         properties.setProperty("partitioner.class","com.ai.paas.ipaas.mds.impl.sender.ModPartitioner");
@@ -25,8 +25,12 @@ public class MsgSenderTest {
         properties.setProperty("send.buffer.bytes","67108864");
         properties.setProperty("maxProducer","5");
 
-        String topicId = "MDS-TEST";
+        String topicId = "test123";
         IMessageSender sender = MsgSenderCmpFactory.getClient(properties, topicId);
-        sender.send("Hello World", 1);
+        long start=System.currentTimeMillis();
+        for(int i=0;i<100000;i++){
+        	sender.send("Hello World", i);
+        }
+        System.out.println(System.currentTimeMillis()-start);
     }
 }
