@@ -1,7 +1,7 @@
 dependencies {
     compile 'com.ai:ipaas-common:0.3'
     compile 'com.ai:ipaas-zookeeper-utility:0.3'
-    compile ('org.apache.kafka:kafka_2.10:0.9.0.1'){
+    compile ('org.apache.kafka:kafka_2.12:1.1.0'){
         exclude group: 'org.slf4j', module: 'slf4j-api'
         exclude group: 'com.101tec', module: 'zkclient'
     }
@@ -35,8 +35,8 @@ publishing {
                         }
                         delegate.dependency {
                             delegate.groupId("org.apache.kafka")
-                            delegate.artifactId("kafka_2.10")
-                            delegate.version("0.9.0.1")
+                            delegate.artifactId("kafka_2.12")
+                            delegate.version("1.1.0")
                         }
                     }
                 }
@@ -63,8 +63,8 @@ publishing {
                         }
                         delegate.dependency {
                             delegate.groupId("org.apache.kafka")
-                            delegate.artifactId("kafka_2.10")
-                            delegate.version("0.9.0.1")
+                            delegate.artifactId("kafka_2.12")
+                            delegate.version("1.1.0")
                         }
                     }
                 }
@@ -79,8 +79,8 @@ publishing {
                 url publishReleaseURL
             }
             credentials {
-                username = publishUserName
-                password = publishUserPassword
+                username = repoUser
+                password = repoPassword
             }
         }
     }

@@ -11,11 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class KafkaConsumer implements Runnable, Serializable {
-    private static transient final Logger logger = LoggerFactory
-            .getLogger(KafkaConsumer.class);
+    private static transient final Logger logger = LoggerFactory.getLogger(KafkaConsumer.class);
     private static final long serialVersionUID = 1780042755212645597L;
 
     private final KafkaConfig _kafkaConfig;
@@ -33,6 +34,8 @@ public class KafkaConsumer implements Runnable, Serializable {
     private String _runningLockPath;
     private String _pauseLockPath;
     private PartitionManager _partitionManager = null;
+    private List<MessageAndMetadata> msgs = null;
+    private long start = 0L;
     /**
      * 自裁锁，如果获得则本线程可以退出运行获取消息，但不能退出，继续获取运行锁
      */
@@ -42,9 +45,8 @@ public class KafkaConsumer implements Runnable, Serializable {
      */
     private InterProcessLock runningLock = null;
 
-    public KafkaConsumer(MessageConsumer consumer, KafkaConfig kafkaConfig,
-                         int partitionId, ZKClient zkClient, String runningLockPath,
-                         String pauseLockPath, IMessageProcessor processor) {
+    public KafkaConsumer(MessageConsumer consumer, KafkaConfig kafkaConfig, int partitionId, ZKClient zkClient,
+            String runningLockPath, String pauseLockPath, IMessageProcessor processor) {
         _kafkaConfig = kafkaConfig;
         _partitionId = partitionId;
         // 此处不应所有线程共用一个连接，这样的话某个线程退出了，则ZK并没有退出，导致节点变化并没有监控到
@@ -57,6 +59,9 @@ public class KafkaConsumer implements Runnable, Serializable {
         _stopped = true;
         _running = false;
         _partitionManager = null;
+        if (processor.isBatch()) {
+            msgs = new ArrayList<MessageAndMetadata>();
+        }
     }
 
     public void open() {
@@ -70,22 +75,19 @@ public class KafkaConsumer implements Runnable, Serializable {
             runningLock = _zkClient.getInterProcessLock(_runningLockPath);
             pauseLock = _zkClient.getInterProcessLock(_pauseLockPath);
         } catch (Exception e) {
-            throw new MessageClientException(
-                    "KafkaConsumer open() get mutex lock error!", e);
+            throw new MessageClientException("KafkaConsumer open() get mutex lock error!", e);
         }
 
         try {
             // 非阻塞模式
-            logger.info("Parition id:" + _partitionId
-                    + ",Starting to acquire lock....." + _runningLockPath);
+            logger.info("Parition id:" + _partitionId + ",Starting to acquire lock....." + _runningLockPath);
             // 这里需要多尝试几次，默认5次吧，每次休眠60秒
             boolean gotLock = false;
             int loop = 0;
             while (!gotLock && loop < 5) {
-            	//尝试20秒内获取锁
+                // 尝试20秒内获取锁
                 if (runningLock.acquire(20, TimeUnit.SECONDS)) {
-                    logger.info("Parition id:" + _partitionId
-                            + ",Got running lock....." + _runningLockPath);
+                    logger.info("Parition id:" + _partitionId + ",Got running lock....." + _runningLockPath);
                     _paused = false;
                     _pausing = false;
                     _stopped = false;
@@ -95,19 +97,14 @@ public class KafkaConsumer implements Runnable, Serializable {
                     boolean inited = false;
                     while (!inited) {
                         try {
-                            _connections = new DynamicPartitionConnections(
-                                    _kafkaConfig, new ZkBrokerReader(
-                                    _kafkaConfig, _state));
-                            _coordinator = new ZkCoordinator(_connections,
-                                    _kafkaConfig, _zkClient, _state,
+                            _connections = new DynamicPartitionConnections(_kafkaConfig,
+                                    new ZkBrokerReader(_kafkaConfig, _state));
+                            _coordinator = new ZkCoordinator(_connections, _kafkaConfig, _zkClient, _state,
                                     _partitionId, this, true);
-                            _partitionManager = _coordinator
-                                    .getMyManagedPartitions().get(0);
+                            _partitionManager = _coordinator.getMyManagedPartitions().get(0);
                             inited = true;
                         } catch (Exception e) {
-                            logger.error(
-                                    "Topic parition init error! _partitionId="
-                                            + _partitionId + " error!", e);
+                            logger.error("Topic parition init error! _partitionId=" + _partitionId + " error!", e);
                             TimeUnit.SECONDS.sleep(60);
                         }
                     }
@@ -123,8 +120,7 @@ public class KafkaConsumer implements Runnable, Serializable {
                             }
                         }
                     } catch (Exception e) {
-                        logger.error("Release pause lock:=" + _pauseLockPath
-                                + " error!", e);
+                        logger.error("Release pause lock:=" + _pauseLockPath + " error!", e);
                     }
                     gotLock = true;
                 } else {
@@ -134,8 +130,7 @@ public class KafkaConsumer implements Runnable, Serializable {
                 loop++;
             }
         } catch (Exception e) {
-            logger.error("Acquire running lock:=" + _runningLockPath
-                    + " error!", e);
+            logger.error("Acquire running lock:=" + _runningLockPath + " error!", e);
         }
         _consumer.addRunningNum();
     }
@@ -148,10 +143,42 @@ public class KafkaConsumer implements Runnable, Serializable {
     public void process(MessageAndMetadata mmeta) {
         // 这里进行处理每个消息
         if (null != mmeta) {
-            try {
-                _processor.process(mmeta);
-            } catch (Exception e) {
-                throw new FailedFetchException(e);
+            if (_processor.isBatch()) {
+                if (null == msgs)
+                    msgs = new ArrayList<MessageAndMetadata>();
+                // 先添加进去
+                msgs.add(mmeta);
+                // 累计消息到了，则开始处理
+                if (msgs.size() >= _processor.getBatchSize()) {
+                    try {
+                        _processor.process(msgs.toArray(new MessageAndMetadata[msgs.size()]));
+                        // 在这里清空，可以重试
+                        msgs.clear();
+                        // 这里开始计时
+                        start = System.currentTimeMillis();
+                    } catch (Exception e) {
+                        throw new FailedFetchException(e);
+                    }
+                } else {
+                    // 如果大于10S也就返回了
+                    if ((System.currentTimeMillis() - start) > 10000L) {
+                        try {
+                            _processor.process(msgs.toArray(new MessageAndMetadata[msgs.size()]));
+                            // 在这里清空，可以重试
+                            msgs.clear();
+                            // 这里开始计时
+                            start = System.currentTimeMillis();
+                        } catch (Exception e) {
+                            throw new FailedFetchException(e);
+                        }
+                    }
+                }
+            } else {
+                try {
+                    _processor.process(mmeta);
+                } catch (Exception e) {
+                    throw new FailedFetchException(e);
+                }
             }
         }
     }
@@ -181,17 +208,14 @@ public class KafkaConsumer implements Runnable, Serializable {
             // 这里可能存在kafka问题，也可能是自身的问题
             logger.warn("Fetch failed. Refresing Coordinator..", fe);
             try {
-            	//再尝试取消息
+                // 再尝试取消息
                 _coordinator.refresh();
-                _partitionManager = _coordinator.getMyManagedPartitions()
-                        .get(0);
+                _partitionManager = _coordinator.getMyManagedPartitions().get(0);
             } catch (Exception ex) {
-                logger.error("Error refresing Coordinator.. for partition id:"
-                        + _partitionId, ex);
+                logger.error("Error refresing Coordinator.. for partition id:" + _partitionId, ex);
             }
         } catch (Exception ex) {
-            logger.error("Partition " + _partitionId
-                    + " encountered error during createStream : ", ex);
+            logger.error("Partition " + _partitionId + " encountered error during createStream : ", ex);
             // 此线程不能退出，需要重复尝试创建，万一存在其他异常，也不退出？
         }
 
@@ -229,8 +253,7 @@ public class KafkaConsumer implements Runnable, Serializable {
                 }
             }
         } catch (Exception e) {
-            logger.error("Release running lock:=" + _runningLockPath
-                    + " error!", e);
+            logger.error("Release running lock:=" + _runningLockPath + " error!", e);
         }
         // 此处应该完事了，这是设置pause=true
         _paused = true;
@@ -291,8 +314,7 @@ public class KafkaConsumer implements Runnable, Serializable {
 
     @Override
     public String toString() {
-        return _kafkaConfig._stateConf.get(Config.KAFKA_TOPIC) + ":"
-                + _partitionId;
+        return _kafkaConfig._stateConf.get(Config.KAFKA_TOPIC) + ":" + _partitionId;
     }
 
 }
