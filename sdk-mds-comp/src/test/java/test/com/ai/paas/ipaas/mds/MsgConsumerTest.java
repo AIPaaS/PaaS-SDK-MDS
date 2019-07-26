@@ -1,8 +1,9 @@
 package test.com.ai.paas.ipaas.mds;
 
-import com.ai.paas.ipaas.mds.IMessageConsumer;
-import com.ai.paas.ipaas.mds.IMsgProcessorHandler;
+import com.ai.paas.ipaas.mds.IConsumer;
 import com.ai.paas.ipaas.mds.MsgConsumerCmpFactory;
+import com.ai.paas.ipaas.mds.Processor;
+import com.ai.paas.util.UUIDTool;
 
 import java.util.Properties;
 
@@ -11,26 +12,17 @@ import org.junit.Test;
 public class MsgConsumerTest {
 	
 	@Test
-    public void testConsumerMessage() throws InterruptedException {
+    public void testConsumerMessage()  {
         Properties properties = new Properties();
-        properties.setProperty("kafka.zookeeper.hosts", "10.1.245.224:30181,10.1.245.225:30281,10.1.245.8:30281");
-        properties.setProperty("kafka.zookeeper.broker.path", "/brokers");
-        properties.setProperty("kafka.zookeeper.user", "");
-        properties.setProperty("kafka.zookeeper.user.passwd", "");
-        properties.setProperty("kafka.consumer.id", "123456");
-        properties.setProperty("mds.partition.runninglock.path", "/baas/MDS/zhangxin10/MDS-TEST/consumer/partitions");
-        properties.setProperty("mds.partition.pauselock.path", "/baas/MDS/zhangxin10/MDS-TEST/consumer/partitions");
-        properties.setProperty("mds.partition.offset.basepath", "/baas/MDS/zhangxin10/MDS-TEST/consumer/" +
-                "offsets");
-        properties.setProperty("mds.consumer.base.path", "/baas/MDS/zhangxin10/MDS-TEST");
-        properties.setProperty("mds.zookeeper.hosts", "10.1.245.224:30181,10.1.245.225:30281,10.1.245.8:30281");
+        properties.setProperty("bootstrap.servers", "10.12.2.144:19092,10.12.2.145:19092,10.12.2.146:19092");
+        properties.setProperty("group.id", UUIDTool.genShortId());
+        properties.setProperty("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        properties.setProperty("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        
 
-        String topicId = "test123";
-        IMsgProcessorHandler processorClass = new ProcessorClass();
-        IMessageConsumer sender = MsgConsumerCmpFactory.getClient(properties, topicId, processorClass);
+        String topic = "DOUBO_TEST";
+        Processor processor=new MessageProcessor();
+        IConsumer sender = MsgConsumerCmpFactory.getClient(properties, topic, processor);
         sender.start();
-        while (true) {
-            Thread.sleep(1000L);
-        }
     }
 }

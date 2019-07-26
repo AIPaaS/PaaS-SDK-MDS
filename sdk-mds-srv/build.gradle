@@ -1,7 +1,7 @@
 dependencies {
     compile project(":sdk-mds-base")
-    compile 'com.ai:ipaas-uac:0.3'
-    compile 'com.ai:ipaas-ccs-inner:0.3'
+    compile 'com.ai:ipaas-uac:1.0'
+    compile 'com.ai:ipaas-ccs-inner:1.0'
 }
 
 publishing {
@@ -17,17 +17,17 @@ publishing {
                         delegate.dependency {
                             delegate.groupId("com.ai")
                             delegate.artifactId("ipaas-mds-base")
-                            delegate.version("0.3.4")
+                            delegate.version("1.0")
                         }
                         delegate.dependency {
                             delegate.groupId("com.ai")
                             delegate.artifactId("ipaas-uac")
-                            delegate.version("0.3")
+                            delegate.version("1.0")
                         }
                         delegate.dependency {
                             delegate.groupId("com.ai")
                             delegate.artifactId("ipaas-ccs-inner")
-                            delegate.version("0.3")
+                            delegate.version("1.0")
                         }
                     }
                 }
@@ -46,17 +46,17 @@ publishing {
                         delegate.dependency {
                             delegate.groupId("com.ai")
                             delegate.artifactId("ipaas-mds-base")
-                            delegate.version("0.3.4")
+                            delegate.version("1.0")
                         }
                         delegate.dependency {
                             delegate.groupId("com.ai")
                             delegate.artifactId("ipaas-uac")
-                            delegate.version("0.3")
+                            delegate.version("1.0")
                         }
                         delegate.dependency {
                             delegate.groupId("com.ai")
                             delegate.artifactId("ipaas-ccs-inner")
-                            delegate.version("0.3")
+                            delegate.version("1.0")
                         }
                     }
                 }

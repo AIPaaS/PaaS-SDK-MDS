@@ -1,17 +1,12 @@
-package test.com.ai.paas.ipaas.mds;
+package com.ai.paas.ipaas.mds;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ai.paas.ipaas.mds.Processor;
-
-/**
- * Created by xin on 16-3-16.
- */
-public class MessageProcessor implements Processor {
-    private static final Logger log = LoggerFactory.getLogger(MessageProcessor.class);
+public class MsgProcessor implements Processor {
+    private static final Logger log = LoggerFactory.getLogger(MsgProcessor.class);
 
     @Override
     public void process(ConsumerRecord<String, String> message) throws Exception {
@@ -37,4 +32,5 @@ public class MessageProcessor implements Processor {
     public int getBatchSize() {
         return 0;
     }
+
 }

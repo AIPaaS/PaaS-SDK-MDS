@@ -1,7 +1,7 @@
 package com.ai.paas.ipaas.mds;
 
 
-public interface IMessageConsumer {
+public interface IConsumer {
 	
 	
 	/**
