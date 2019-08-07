@@ -15,7 +15,7 @@ public class MessageProcessor implements Processor {
 
     @Override
     public void process(ConsumerRecord<String, String> message) throws Exception {
-        log.info("-------------------------------{}---------", message.value());
+        log.info("-------------++++++------------------{}---------", message.value());
 
     }
 
@@ -30,7 +30,7 @@ public class MessageProcessor implements Processor {
 
     @Override
     public boolean isBatch() {
-        return true;
+        return false;
     }
 
     @Override

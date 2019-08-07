@@ -68,7 +68,7 @@ public class SenderTest {
     public void testBatchSend() {
         LinkedHashMap<String, String> msgs = new LinkedHashMap<>();
         for (int i = 0; i < 1000; i++) {
-            msgs.put("i" + i, "This ia test message!" + i);
+            msgs.put("i" + i, "This ia test fffffffffffmessage!" + i);
         }
         sender.send(msgs);
         sender.send(0, msgs);

@@ -1,5 +1,6 @@
 package test.com.ai.paas.ipaas.mds;
 
+import java.util.LinkedHashMap;
 import java.util.Properties;
 
 import org.junit.Test;
@@ -25,6 +26,13 @@ public class MsgSenderTest {
 
         String topic = "DOUBO_TEST";
         IProducer sender = MsgSenderCmpFactory.getClient(properties, topic);
+        LinkedHashMap<String, String> msgs = new LinkedHashMap<>();
+        for (int i = 0; i < 1000; i++) {
+            msgs.put("i" + i, "This ia test message!" + i);
+        }
+        sender.send(msgs);
+        sender.send(0, msgs);
+        sender.send(1, msgs);
         long start = System.currentTimeMillis();
         for (int i = 0; i < 100000; i++) {
             sender.asyncSend("bbbb" + i, "Hello World");
